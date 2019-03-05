@@ -1,6 +1,8 @@
+  require_relative 'drink.rb'
 class User < ActiveRecord::Base
   has_many :ratings
   has_many :drinks, through: :ratings
+  attr_reader :last_input
 
   def self.welcome
     puts "Enter your age:"
@@ -9,6 +11,7 @@ class User < ActiveRecord::Base
     if input1.to_i > 20
       puts "Welcome to C2H50H - World"
        self.insert_name
+       Drink.alcohol_or_no
 
     else
       puts "Do you want to see our non-alcohol drink?(Y/N)"
@@ -30,5 +33,12 @@ class User < ActiveRecord::Base
     #Update Userinfo
   end
 
+
+
+
+  # private
+  # def user_input
+  #   @last_input = gets.strip
+  # end
 
 end

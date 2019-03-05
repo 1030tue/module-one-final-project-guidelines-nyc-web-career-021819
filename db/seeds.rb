@@ -1,4 +1,12 @@
 
+
+
+def get_character_movies_from_api(character_name)
+  #make the web request
+
+  response_string = RestClient.get("http://www.swapi.co/api/people/")
+  response_hash = JSON.parse(response_string)
+
 #user
 u1 = User.create(:name => "Kate", :age => "15")
 u2 = User.create(:name => "Diana", :age => "24")
