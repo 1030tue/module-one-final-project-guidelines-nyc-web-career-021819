@@ -11,14 +11,14 @@ class Drink < ActiveRecord::Base
   def self.alcohol_or_no
     puts "Would like to have a virgin drink? (Y/N)"
     input = gets.strip
-    if input.to_s != "N"
-     num = Drink.get_number_from_user
-     self.cocktail_list(num)
+    if input.to_s.downcase == "n"
+      self.selection
+      num = Drink.get_number_from_user
+      self.cocktail_list(num)
    end
   end
 
   def self.get_number_from_user
-    self.selection
     input = gets.strip
     input.to_i
     # if input.to_i == 1
@@ -50,7 +50,12 @@ class Drink < ActiveRecord::Base
               response_hash = JSON.parse(response_string)
               drinks = response_hash["drinks"]
               list = drinks.map {|d| d["strDrink"]}
-         puts list.sample(5)
+              list5 = list.sample(5)
+              n = 0
+              list5.each do |d|
+                n+=1
+                puts "#{n}. #{d}"
+              end
        elsif
          num == 2
          puts "do whatev"
