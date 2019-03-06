@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 20190305190201) do
   create_table "wishes", force: :cascade do |t|
     t.integer "user_id"
     t.integer "drink_id"
+    t.string  "drink_name"
   end
 
 end
