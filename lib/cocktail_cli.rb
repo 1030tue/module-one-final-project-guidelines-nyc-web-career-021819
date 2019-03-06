@@ -2,43 +2,142 @@
 class CLI
 
 
-  def welcome
-    puts "Hey! Welcome to our app!!"
-    get_name
+    def welcome
+      puts "Hey! Welcome to our app!!"
+      get_name
 
-  end
+    end
 
-  def get_name
-    puts "Enter your name:"
-    @name = gets.chomp
-    get_age
-  end
-
-
-  def get_age
-    puts "Enter your age:"
-    @age = gets.chomp.to_i
-    get_user
-  end
-
-  def get_user
-    User.find_or_create_by(name: @name , age: @age)
-    over_20
-  end
+    def get_name
+      puts "Enter your name:"
+      @name = gets.chomp
+      get_age
+    end
 
 
-  def over_20
-    if @age > 20
-      Drink.alcohol_or_no
-    else
-       puts "Do you want to see our non-alcohol drink?(Y/N)"
-        ans = gets.chomp
-        if ans.downcase == "y"
-          puts "we should put non alcoholic list "
-        else
-          puts "Enjoy your life!"
-        end
+    def get_age
+      puts "Enter your age:"
+      @age = gets.chomp.to_i
+      get_user
+    end
+
+    def get_user
+      User.find_or_create_by(name: @name , age: @age)
+      over_20
+    end
+
+
+    def over_20
+      if @age > 20
+        alcohol_or_no
+      else
+         puts " >> You are not legally allowed to consume alcohol << . \n Do you want to see our non-alcohol cocktails?(Y/N)"
+          ans = gets.chomp
+          if ans.downcase == "y"
+            puts "!!!! Non Alcoholic Drink List"
+          else
+            puts "Enjoy your life!"
+          end
+       end
+    end
+
+
+    def alcohol_or_no
+      puts "Would you like to grap a glass of cocktail? (Y/N)"
+      input = gets.chomp
+      if input.to_s.downcase == "y"
+        selection
+        cocktail_list(get_number_from_user)
+      else
+        puts "!!!! Non Alcoholic Drink List"
      end
-  end
+    end
+
+    def get_number_from_user
+      input = gets.strip
+      input.to_i
+    end
+
+
+    def selection
+       puts  " >>> Choose your poison:"
+       puts "1. Amaretto"
+       puts "2. Bourbon "
+       puts "3. Gin "
+       puts "4. Tequila "
+       puts "5. Vodka"
+       puts "6. Scotch "
+       puts "7. Wine "
+       puts "8. Exit and go back to Main Menu "
+    end
+
+
+    def cocktail_list(num)
+        if num == 1
+           puts "*** Here is your cocktail list ***"
+           input = "Amaretto"
+           get_drink_name(input)
+           puts "Pick one for more info:"
+           num2 = user_input.to_i
+           get_drink_info(num2)
+         elsif
+           num == 2
+           puts "do whatev"
+        end
+    end
+
+    def get_drink_name(input)
+        response_string = RestClient.get("https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=#{input}")
+        response_hash = JSON.parse(response_string)
+        drinks = response_hash["drinks"]
+        list = drinks.map {|d| d["strDrink"]}
+        list5 = list.sample(5)
+          drink_hash = {}
+            n = 1
+            list5.map do |d|
+            drink_hash[n] = d
+            n+=1
+            end
+              drink_hash.each do |k,v|
+                  puts  "#{k}. #{v}"
+              end
+               @drink_hash = drink_hash
+    end
+
+
+    def user_input
+        input = gets.chomp
+        input
+    end
+
+
+    def get_drink_info(num)
+        @drink_hash.each do |k,v|
+            if num == k
+              response_string= RestClient.get("https://www.thecocktaildb.com/api/json/v1/1/search.php?s=#{v}")
+              response_hash = JSON.parse(response_string)
+              drinks = response_hash["drinks"]
+              drinks.map do |d|
+                drink_id = d["idDrink"]
+                drink_name = d["strDrink"]
+
+              puts " ID: #{d["idDrink"]}"
+              puts " NAME: #{d["strDrink"]}"
+              puts " KEY INGREDIENTS:"
+              puts "\t #{d["strIngredient1"]}"
+              puts "\t #{d["strIngredient2"]}"
+              puts "\t #{d["strIngredient3"]}"
+
+
+              puts "Do you want to add to your favorites? Y/N"
+              input = user_input.to_s
+              if input.downcase == "y"
+                Wish.create(user_id: User.all.last.id, drink_id: drink_id, drink_name: drink_name)
+              end
+            end
+          end
+        end
+    end
+
 
 end
