@@ -19,9 +19,9 @@
 #
 #
 # #rating
-# r1 = Rating.create(user: u1, drink: d1, rating: 4, comment: "Ehh...")
-# r2 = Rating.new(user: u2,drink: d2, rating: 2, comment: "Tasted like a water")
-# r3 = Rating.new(user: u2,drink: d3, rating: 5, comment: "Yummy!")
+r1 = Rating.create(user_id: 61 ,drink_id: 12388, rating: 4, comment: "Ehh...")
+r2 = Rating.create(user_id: 62 ,drink_id: 12388, rating: 2, comment: "Tasted like a water")
+r3 = Rating.create(user_id: 63 ,drink_id: 12388, rating: 5, comment: "Yummy!")
 
 
 # drink = Wish.all.map {|d| d.drink_name}
