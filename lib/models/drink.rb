@@ -10,13 +10,13 @@ class Drink < ActiveRecord::Base
 attr_accessor :drink_hash
 
   def self.alcohol_or_no
-    puts "Would like to have a virgin drink? (Y/N)"
-    input = gets.strip
-    if input.to_s.downcase == "n"
+    # puts "Would like to have a virgin drink? (Y/N)"
+    # input = gets.strip
+    # if input.to_s.downcase == "n"
       self.selection
       num = Drink.get_number_from_user
       self.cocktail_list(num)
-   end
+   # end
   end
 
   def self.get_number_from_user
@@ -27,29 +27,56 @@ attr_accessor :drink_hash
   def self.selection
     puts  "Choose your poison:"
      puts "1. Amaretto"
-     puts "2. Bourbon "
-     puts "3. Gin "
-     puts "4. Tequila "
+     puts "2. Bourbon"
+     puts "3. Gin"
+     puts "4. Tequila"
      puts "5. Vodka"
-     puts "6. Scotch "
-     puts "7. Wine "
-     puts "8. Exit and go back to Main Menu "
+     puts "6. Scotch"
+     puts "7. Wine"
+     puts "8. Exit"
    end
 
    def self.cocktail_list(num)
+     puts "*** Here is your cocktail list ***"
        if num == 1
-         puts "*** Here is your cocktail list ***"
-         input = "Amaretto"
-         self.get_drink_name(input)
+         self.get_drink_name("Amaretto")
          puts "Pick one for more info:"
-         num2 = self.user_input.to_i
-         self.get_drink_info(num2)
+         self.get_drink_info(self.user_input.to_i)
        elsif
          num == 2
-         puts "do whatev"
+         self.get_drink_name("Bourbon")
+         puts "Pick one for more info:"
+         self.get_drink_info(self.user_input.to_i)
+       elsif
+         num == 3
+         self.get_drink_name("Gin")
+         puts "Pick one for more info:"
+         self.get_drink_info(self.user_input.to_i)
+       elsif
+         num == 4
+         self.get_drink_name("Tequila")
+         puts "Pick one for more info:"
+         self.get_drink_info(self.user_input.to_i)
+       elsif
+         num == 5
+         self.get_drink_name("Vodka")
+         puts "Pick one for more info:"
+         self.get_drink_info(self.user_input.to_i)
+       elsif
+         num == 6
+         self.get_drink_name("Scotch")
+         puts "Pick one for more info:"
+         self.get_drink_info(self.user_input.to_i)
+       elsif
+         num == 7
+         self.get_drink_name("Wine")
+         puts "Pick one for more info:"
+         self.get_drink_info(self.user_input.to_i)
+       elsif
+         num == 8
+         puts "Back to Main Menu"
         end
       end
-
 
     def self.get_drink_name(input)
       response_string = RestClient.get("https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=#{input}")
