@@ -3,7 +3,9 @@ require_relative '../config/environment'
 
 
 cli = CLI.new
+# ratingcli = RatingCLI.new
 cli.welcome
+# ratingcli.input_rate
 
 
 
