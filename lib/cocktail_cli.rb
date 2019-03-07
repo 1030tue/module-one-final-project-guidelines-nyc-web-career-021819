@@ -1,13 +1,16 @@
 require_relative 'communication.rb'
+require_relative 'colorize.rb'
+
 
 class CLI
 attr_reader :last_input
 
     def welcome
-      puts "Hey! Welcome to C2H50H WORLD!!"
+      puts "Hey! Welcome to C2H50H WORLD!!".black.bold.blink
       get_name
-
     end
+
+    system "clear"
 
     def get_name
       puts "Enter your name:"
@@ -23,14 +26,20 @@ attr_reader :last_input
         input = user_input.to_i
         array = (1..120).to_a
         if !array.include?(input)
-          puts "<<<<   INVALID!!   >>>>\nHi, #{@name}. Enter your age:"
+          puts "<<<<   INVALID!!   >>>>".magenta
+          puts "Hi, #{@name}. Enter your age:"
         else
           valid = true
           @age = input
+          system "clear"
           get_user
         end
       end
       end
+
+
+
+
 
     def get_user
       @save_user = User.find_or_create_by(name: @name , age: @age)
@@ -42,11 +51,10 @@ attr_reader :last_input
       if @age > 20
         menu_over_20
       else
-         puts " >>>> You are not legally allowed to consume alcohol <<<<  \n       >>> Come and visit us #{21 - @age} years later. <<<
-         \n               >>-  Enjoy your life!  -<< "
+         puts "\n\n >>>> You are not legally allowed to consume alcohol <<<<  \n       >>> Come and visit us #{21 - @age} years later. <<<
+         \n              >>- ❤ Enjoy your life! ❤ -<< ".bold
        end
     end
-
 
     # valid = false
     #   until valid
@@ -66,9 +74,10 @@ attr_reader :last_input
     puts ">>>> What would you like to do?"
     puts "1. View cocktail list"
     puts "2. View virigin drinks"
-    puts "3. View favorites"
+    puts "3. View your Favorites"
     puts "4. Exit"
     main_menu_loop
+    system "clear"
   end
 
 
@@ -90,7 +99,7 @@ attr_reader :last_input
           exit
           break
         else
-          puts "<<<<    INVALID!!    >>>>"
+          puts "<<<<    INVALID!!    >>>>".red
           menu_over_20
           break
         end
@@ -102,6 +111,7 @@ attr_reader :last_input
 
 
     def selection
+      system "clear"
        puts  "***** Base Spirits *****".center(34)
        puts "1. Amaretto"
        puts "2. Bourbon "
@@ -114,6 +124,7 @@ attr_reader :last_input
        puts  " >>>> Choose your poison:"
 
     end
+
 
 
     # def cocktail_list(num)
@@ -169,7 +180,8 @@ attr_reader :last_input
              input1 = user_input.to_i
              array = [1,2,3,4,5]
          if !array.include?(input1)
-           puts " <<<<     INVALID     >>>>  \n>>>> Pick one for more info:"
+           puts " <<<<     INVALID     >>>>".red
+           puts ">>>> Pick one for more info:"
          else
            valid = true
          end
@@ -191,6 +203,7 @@ attr_reader :last_input
             drink_hash[n] = d
             n+=1
             end
+            system "clear"
             puts "***** Here is your cocktail list *****"
               drink_hash.each do |k,v|
                   puts  "#{k}. #{v}"
@@ -201,6 +214,7 @@ attr_reader :last_input
 
 
     def after_save_favorite
+      system "clear"
         puts ">>>> What would you like to do next?"
         puts "1. Back To Main "
         puts "2. View Favorites"
@@ -253,7 +267,7 @@ attr_reader :last_input
             exit
             break
           else
-            puts "<<<<   INVALID!!   >>>>"
+            puts "<<<<   INVALID!!   >>>>".red
             back_to_main
           end
       end
@@ -261,7 +275,8 @@ attr_reader :last_input
 
 
     def exit
-      puts "You've been logged out. \n Enjoy your life. \n Enjoy your drink. \n Drink responsibly. \n *** Come Again!! ***"
+      system "clear"
+      puts "You've been logged out. \n Enjoy your life. \n Enjoy your drink. \n Drink responsibly. \n *** Come Again!! ***".red
       exit!
     end
 
@@ -294,18 +309,21 @@ attr_reader :last_input
 
     def input_rate
       drink = Wish.all.find_by(drink_id: @drinkid_input)
-      puts ">>>> Please rate from 0 to 5:"
+      puts ">>>> Please rate from 0 to 5:".bold
 
         valid = false
         until valid
-          if input2 = user_input.to_f
-            array = (1..5).to_a
-            if !array.include?(input2)
-              puts "<<<<     INVALID     >>>> "
+          if input2 = user_input
+            if input2.to_f.to_s != input2
+              puts "<<<<     INVALID     >>>> ".red
               input_rate
+              if input2.to_f > 5 || input2.to_f < 0
+                puts "<<<<     INVALID     >>>> ".red
+                input_rate
             else
               valid = true
             end
+          end
           end
 
 
@@ -323,7 +341,8 @@ attr_reader :last_input
         array = ["yes", "no", "y", "n"]
         input3 = user_input.to_s.downcase
         if !array.include?(input3)
-          puts " <<<<     INVALID     >>>> \n>>>> Would you like to leave comment as well?(Y/N)"
+          puts " <<<<     INVALID     >>>>".red
+          puts ">>>> Would you like to leave comment as well?(Y/N)"
 
         else
           valid = true
@@ -383,37 +402,37 @@ attr_reader :last_input
       end
 
 
-      #y/n input
-      def yes_or_no_input
-        if user_input.downcase != "y" || user_input.downcase != "n"
-          puts "Please enter \'y\' or \'n\'."
-          yes_or_no_input
-        end
-      end
-
-
-      def ask_yes_or_no(q = "Please enter \'y\' or \'n\'.", arr = [Y, N])
-        valid = false
-          until valid
-              puts q
-              user_input
-              if arr.include?(user_input)
-                valid = true
-              end
-          end
-        end
-
-
-
-      #whole number input
-      def integer_input
-        if user_input.integer?
-          user_input
-        else
-          put "this is not a valid option"
-          user_input
-        end
-      end
+      # #y/n input
+      # def yes_or_no_input
+      #   if user_input.downcase != "y" || user_input.downcase != "n"
+      #     puts "Please enter \'y\' or \'n\'."
+      #     yes_or_no_input
+      #   end
+      # end
+      #
+      #
+      # def ask_yes_or_no(q = "Please enter \'y\' or \'n\'.", arr = [Y, N])
+      #   valid = false
+      #     until valid
+      #         puts " <<<<     INVALID     >>>>".red
+      #         user_input
+      #         if arr.include?(user_input)
+      #           valid = true
+      #         end
+      #     end
+      #   end
+      #
+      #
+      #
+      # #whole number input
+      # def integer_input
+      #   if user_input.integer?
+      #     user_input
+      #   else
+      #     put "this is not a valid option"
+      #     user_input
+      #   end
+      # end
 
 
 
@@ -437,7 +456,7 @@ attr_reader :last_input
             until valid
             input1 = user_input.to_i
             if !array.include?(input1)
-              puts " <<<<     INVALID     >>>>  \n"
+              puts " <<<<     INVALID     >>>>  \n".red
               selection
             else
               valid = true
@@ -445,9 +464,6 @@ attr_reader :last_input
             end
           end
       end
-
-
-
 
 
 

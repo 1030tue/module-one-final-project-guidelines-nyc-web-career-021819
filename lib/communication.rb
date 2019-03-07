@@ -13,6 +13,7 @@
               drink_hash[n] = d
               n+=1
               end
+              system "clear"
               puts "*** Here is your non alcoholic drink list ***"
                 drink_hash.each do |k,v|
                     puts  "#{k}. #{v}"
@@ -24,7 +25,8 @@
                        input1 = user_input.to_i
                        array = [1,2,3,4,5]
                    if !array.include?(input1)
-                     puts " <<<<     INVALID     >>>>  \n>>>> Pick one for more info:"
+                     puts " <<<<     INVALID     >>>>  ".red
+                     puts ">>>> Pick one for more info:".bold
                    else
                      valid = true
                    end
@@ -65,14 +67,15 @@
               puts "\t #{d["strIngredient3"]}"
               display_rate(d["idDrink"].to_i)
 
-              puts ">>>> Do you want to add to your favorites? Y/N"
+              puts ">>>> Would you like to add this cocktail to your Favorites? (Y/N)".bold
 
               valid = false
                 until valid
                 array = ["yes", "no", "y", "n"]
                 input1 = user_input.to_s.downcase
                 if !array.include?(input1)
-                  puts " <<<<     INVALID     >>>> \n>>>> Do you want to add this drink to your favorites? Y/N"
+                  puts " <<<<     INVALID     >>>> ".red
+                  puts ">>>> Do you want to add this drink to your favorites? Y/N".bold
 
                 else
                   valid = true
@@ -93,7 +96,7 @@
         favorite = Wish.all.where(user_id: @save_user)
         f_arr = favorite.map {|f| f.drink_name}
         if f_arr.length == 0
-          puts "Oh, no! You have no favorites yet!"
+          puts "Oh, no! You have no favorites yet!".red
           menu_over_20
         else
         f_arr.each do |n|
