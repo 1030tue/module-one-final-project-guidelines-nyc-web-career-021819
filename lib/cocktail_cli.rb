@@ -22,7 +22,8 @@ attr_reader :last_input
     end
 
     def get_user
-      User.find_or_create_by(name: @name , age: @age)
+      @save_user = User.find_or_create_by(name: @name , age: @age)
+      binding.pry
       over_20
     end
 
@@ -212,8 +213,7 @@ attr_reader :last_input
 
               puts "Do you want to add to your favorites? Y/N"
               if user_input.to_s.downcase == "y"
-                u_id = User.all.find_by(name: @name).id
-                Wish.create(user_id: u_id, drink_id: drink_id, drink_name: drink_name)
+                Wish.create(user_id: @save_user.id, drink_id: drink_id, drink_name: drink_name)
               end
             end
           end
@@ -243,8 +243,7 @@ attr_reader :last_input
 
 
     def see_favorites
-      u_id = User.all.find_by(name: @name).id
-      favorite = Wish.all.where(user_id: u_id)
+      favorite = Wish.all.where(user_id: @save_user.id)
       f_arr = favorite.map {|f| f.drink_name}
       if f_arr.length == 0
         puts "Oh, no! You have no favorites yet!"
@@ -264,7 +263,7 @@ attr_reader :last_input
       puts "\t #{d["strIngredient3"]}"
       display_rate(d["idDrink"].to_i)
       display_comment(d["idDrink"].to_i)
-              puts "*" * 5
+      puts "*" * 5
     end
     end
     end
@@ -323,8 +322,7 @@ attr_reader :last_input
       until valid
         puts "Type the exact drink ID to leave rating:"
         input1 = user_input.to_i
-        u_id = User.all.find_by(name: @name).id
-        favorite = Wish.all.where(user_id: u_id)
+        favorite = Wish.all.where(user_id: @save_user.id)
         f_arr = favorite.map {|f| f.drink_id}
         if !f_arr.include?(input1)
           puts "Plase enter a valid drink ID from your favorite list"
@@ -338,12 +336,11 @@ attr_reader :last_input
       drink = Wish.all.find_by(drink_id: input1)
       puts "Please rate from 0 to 5:"
       input2 = user_input.to_f
-      u_id = User.all.find_by(name: @name).id
       rating = Rating.all.find_by(drink_id: input1)
       if rating
-        Rating.all.where(user_id: u_id).where(drink_id: input1).update(rating: input2)
+        Rating.all.where(user_id: @save_user.id).where(drink_id: input1).update(rating: input2)
       else
-          Rating.create(user_id: u_id, drink_id: input1, rating: input2)
+          Rating.create(user_id: @save_user.id, drink_id: input1, rating: input2)
         end
       puts "Your rating has been saved"
       puts "Would you like to leave comment as well?(Y/N)"
@@ -369,12 +366,11 @@ attr_reader :last_input
     def leave_comment(drink_id)
       puts "Enter your comment. (limit 100 char)"
       comment = user_input.to_s
-      u_id = User.all.find_by(name: @name).id
       rating = Rating.all.find_by(drink_id: drink_id)
       if rating
-        Rating.all.where(user_id: u_id).where(drink_id: drink_id).update(comment: comment)
+        Rating.all.where(user_id: @save_user.id).where(drink_id: drink_id).update(comment: comment)
       else
-          Rating.create(user_id: u_id, drink_id: drink_id, comment: comment)
+          Rating.create(user_id: @save_user.id, drink_id: drink_id, comment: comment)
         end
         puts "Your comment has been saved"
         menu_over_20
