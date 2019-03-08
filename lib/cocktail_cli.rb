@@ -1,225 +1,183 @@
 require_relative 'communication.rb'
 require_relative 'colorize.rb'
 
+class String
+  BLANK_RE = /\A[[:space:]]*\z/
+def blank?
+  empty? || BLANK_RE.match?(self)
+ end
+end
 
-class CLI
+
+
+class CLI < String
 attr_reader :last_input
 
     def welcome
-      puts "Hey! Welcome to C2H50H WORLD!!".black.bold.blink
+      puts "Hey! Welcome to C2H50H WORLD!!".black.bold.swap
+      @pid = fork{ exec 'afplay', "lib/Autumn Leaves Chet Baker - Paul Desmond.mp3" }
       get_name
     end
 
     system "clear"
 
+
+
     def get_name
-      puts "Enter your name:"
-      @name = gets.chomp
-      get_age
+      valid = false
+      until valid
+          puts "Enter your name:"
+            name = gets.chomp
+        if name.blank? == true || name.to_s.length < 2
+          puts "<<<<  INVALID!!  >>>>".red.bold
+        else
+          valid = true
+          @name = name
+        end
+      end
+          get_age
     end
 
 
+
     def get_age
-      puts "Hi, #{@name}. Enter your age:"
-      valid = false
-      until valid
-        input = user_input.to_i
-        array = (1..120).to_a
-        if !array.include?(input)
-          puts "<<<<   INVALID!!   >>>>".magenta
-          puts "Hi, #{@name}. Enter your age:"
-        else
-          valid = true
-          @age = input
+      promt = "Hi, #{@name}. Enter your age:"
+          valid(promt, (1..120).to_a)
           system "clear"
           get_user
-        end
       end
-      end
-
-
 
 
 
     def get_user
-      @save_user = User.find_or_create_by(name: @name , age: @age)
+      @save_user = User.find_or_create_by(name: @name , age: @input)
       over_20
     end
 
 
     def over_20
-      if @age > 20
+      if @input > 20
         menu_over_20
       else
-         puts "\n\n >>>> You are not legally allowed to consume alcohol <<<<  \n       >>> Come and visit us #{21 - @age} years later. <<<
+         Process.kill("SIGKILL", @pid)
+         puts "\n\n >>>> You are not legally allowed to consume alcohol. <<<<  \n       >>> Come and visit us #{21 - @input} years later. <<<
          \n              >>- ❤ Enjoy your life! ❤ -<< ".bold
        end
     end
 
-    # valid = false
-    #   until valid
-    #       input1 = user_input.to_i
-    #       array = [1,2,3,4,5]
-    #   if !array.include?(input1)
-    #     puts ">>>> ABORTED! This is not valid. \n>>>> Please try again. >>>>"
-    #   else
-    #     valid = true
-    #   end
-    # end
-    #  get_drink_info(input1)
 
-
-
-    def menu_over_20
-    puts ">>>> What would you like to do?"
-    puts "1. View cocktail list"
-    puts "2. View virigin drinks"
-    puts "3. View your Favorites"
-    puts "4. Exit"
-    main_menu_loop
-    system "clear"
-  end
-
-
-
-  def main_menu_loop
-      while user_input != "100"
-        case last_input.to_i
-        when 1
-          selection
-          ask_validity([1,2,3,4,5,6,7,8])
-          break
-        when 2
-          non_alcoholic_selection
-          break
-        when 3
-          see_favorites
-          break
-        when 4
-          exit
-          break
-        else
-          puts "<<<<    INVALID!!    >>>>".red
-          menu_over_20
-          break
-        end
-    end
-  end
-
-
-
-
-
-    def selection
-      system "clear"
-       puts  "***** Base Spirits *****".center(34)
-       puts "1. Amaretto"
-       puts "2. Bourbon "
-       puts "3. Gin "
-       puts "4. Tequila "
-       puts "5. Vodka"
-       puts "6. Scotch "
-       puts "7. Wine "
-       puts "8. Exit and go back to Main Menu "
-       puts  " >>>> Choose your poison:"
-
-    end
-
-
-
-    # def cocktail_list(num)
-    #   @drink_hash.select do |k,v|
-    #     if num = k
-    #       get_drink_name(v)
-    #       more_info
-    #     end
-    #   end
-    # end
-
-
-    def cocktail_list(num)
-        if num == 1
-           get_drink_name("Amaretto")
-           more_info
-         elsif
-         num == 2
-          get_drink_name("Bourbon")
-          more_info
-         elsif
-           num == 3
-           get_drink_name("Gin")
-           more_info
-         elsif
-           num == 4
-           get_drink_name("Tequila")
-        more_info
-         elsif
-           num == 5
-           get_drink_name("Vodka")
-           more_info
-         elsif
-           num == 6
-           get_drink_name("Scotch")
-           more_info
-         elsif
-           num == 7
-           get_drink_name("Wine")
-           more_info
-         elsif
-           num == 8
-           puts "Back to Main Menu"
-           menu_over_20
+      def menu_over_20
+          puts ">>>> What would you like to do?"
+          puts "1. View cocktail list"
+          puts "2. View virigin drinks"
+          puts "3. Find cocktail by name"
+          puts "4. View your Favorites"
+          puts "5. Exit"
+          main_menu_loop
+          system "clear"
       end
-   end
+
+
+
+      def main_menu_loop
+          while user_input != "100"
+            case last_input.to_i
+            when 1
+              selection
+              ask_validity([1,2,3,4,5,6,7,8])
+              break
+            when 2
+              non_alcoholic_selection
+              break
+            when 3
+              cocktail_find_by_name
+              break
+            when 4
+              see_favorites
+              break
+            when 5
+              exit
+              break
+            else
+              puts "<<<<    INVALID!!    >>>>".red.bold
+              menu_over_20
+              break
+            end
+        end
+      end
+
+
+      def spirits_hash
+        {1 => "Amaretto", 2 => "Bourbon", 3 => "Gin", 4 => "Tequila", 5 => "Vodka", 6 => "Scotch", 7 => "Wine"}
+      end
+
+
+      def selection
+          system "clear"
+           puts  "***** Base Spirits *****".center(34)
+         spirits_hash.each do |k,v|
+           puts  "#{k}. #{v}"
+         end
+         puts "8. Exit and go back to Main Menu "
+         puts  " >>>> Choose your poison:".bold
+      end
+
+
+
+        def cocktail_list(num)
+            spirits_hash.select do |k,v|
+            if num < 8
+              s_has = spirits_hash.select {|k,v| k == num}
+              s_name = s_has.values.join()
+              get_drink_name(s_name)
+              more_info
+            elsif num == 8
+              puts "Back to Main Menu"
+              menu_over_20
+           end
+          end
+        end
+
 
 
      def more_info
-       puts ">>>> Pick one for more info:"
-       valid = false
-         until valid
-             input1 = user_input.to_i
-             array = [1,2,3,4,5]
-         if !array.include?(input1)
-           puts " <<<<     INVALID     >>>>".red
-           puts ">>>> Pick one for more info:"
-         else
-           valid = true
-         end
-       end
-        get_drink_info(input1)
+       prompt = ">>>> Pick one for more info:".bold
+       valid(prompt, [1,2,3,4,5])
+       get_drink_info(@input)
      end
 
 
 
-    def get_drink_name(input)
-        response_string = RestClient.get("https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=#{input}")
-        response_hash = JSON.parse(response_string)
-        drinks = response_hash["drinks"]
-        list = drinks.map {|d| d["strDrink"]}
-        list5 = list.sample(5)
-          drink_hash = {}
-            n = 1
-            list5.map do |d|
-            drink_hash[n] = d
-            n+=1
-            end
-            system "clear"
-            puts "***** Here is your cocktail list *****"
-              drink_hash.each do |k,v|
-                  puts  "#{k}. #{v}"
+      def get_drink_name(input)
+          response_string = RestClient.get("https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=#{input}")
+          response_hash = JSON.parse(response_string)
+          drinks = response_hash["drinks"]
+          list = drinks.map {|d| d["strDrink"]}
+          list5 = list.sample(5)
+            drink_hash = {}
+              n = 1
+              list5.map do |d|
+              drink_hash[n] = d
+              n+=1
               end
-               @drink_hash = drink_hash
-    end
+              system "clear"
+              puts "***** Here is your cocktail list *****"
+                drink_hash.each do |k,v|
+                    puts  "#{k}. #{v}"
+                end
+                 @drink_hash = drink_hash
+      end
 
 
 
     def after_save_favorite
-      system "clear"
         puts ">>>> What would you like to do next?"
         puts "1. Back To Main "
         puts "2. View Favorites"
         after_save_favorite_options
     end
+
+
 
     def after_save_favorite_options
       while user_input != 100
@@ -231,7 +189,7 @@ attr_reader :last_input
         see_favorites
           break
         else
-          puts "<<<<    INVALID!!!    >>>>"
+          puts "<<<<    INVALID!!!    >>>>".red.bold
           after_save_favorite
         end
       end
@@ -247,7 +205,7 @@ attr_reader :last_input
       puts "4. Exit"
       menu_options
     end
-
+system "clear"
     def menu_options
         while user_input != 4
           case last_input.to_i
@@ -276,25 +234,29 @@ attr_reader :last_input
 
     def exit
       system "clear"
-      puts "You've been logged out. \n Enjoy your life. \n Enjoy your drink. \n Drink responsibly. \n *** Come Again!! ***".red
+
+      Process.kill("SIGKILL", @pid)
+
+      puts "You've been logged out. \n Enjoy your life. \n Enjoy your drink. \n Drink responsibly. \n *** Come Again!! ***".bold.blink
       exit!
+
     end
 
 
     def delete_favorites_by_drink_id(input)
-      drink = Wish.all.find_by(drink_id: input)
+      drink = Wish.all.where(user_id:@save_user.id).find_by(drink_id: input.to_i)
+      puts "\"#{input}\" has been deleted from your favorites."
       drink.destroy
-      puts "Your rating has been deleted"
     end
 
 
-#asking drinkID
+
     def input_drink_id
       valid = false
       until valid
         puts "Type the exact drink ID to leave rating:"
         @drinkid_input = user_input.to_i
-        favorite = Wish.all.where(user_id: @save_user)
+        favorite = Wish.all.where(user_id: @save_user.id)
         f_arr = favorite.map {|f| f.drink_id}
         if !f_arr.include?(@drinkid_input)
           puts "Plase enter a valid drink ID from your favorite list"
@@ -305,94 +267,96 @@ attr_reader :last_input
       input_rate
     end
 
-
+    def number?(obj)
+      obj = obj.to_s unless obj.is_a? String
+      /\A[+-]?\d+(\.[\d]+)?\z/.match(obj)
+    end
 
     def input_rate
       drink = Wish.all.find_by(drink_id: @drinkid_input)
       puts ">>>> Please rate from 0 to 5:".bold
-
         valid = false
         until valid
-          if input2 = user_input
-            if input2.to_f.to_s != input2
+            input2 = user_input
+            if !number?(input2)
               puts "<<<<     INVALID     >>>> ".red
               input_rate
-              if input2.to_f > 5 || input2.to_f < 0
+             elsif input2.to_f > 5 || input2.to_f < 0
                 puts "<<<<     INVALID     >>>> ".red
                 input_rate
-            else
-              valid = true
-            end
-          end
-          end
+                else
+                  valid = true
+                  @input2 = input2.to_f
+              end
 
-
-      rating = Rating.all.find_by(drink_id: @drinkid_input)
-      if rating
-        Rating.all.where(user_id: @save_user).where(drink_id: @drinkid_input).update(rating: input2)
-      else
-          Rating.create(user_id: @save_user, drink_id: @drinkid_input, rating: input2)
         end
-      puts "Your rating has been saved"
-      puts ">>>> Would you like to leave comment as well?(Y/N)"
-
-      valid = false
-        until valid
-        array = ["yes", "no", "y", "n"]
-        input3 = user_input.to_s.downcase
-        if !array.include?(input3)
-          puts " <<<<     INVALID     >>>>".red
-          puts ">>>> Would you like to leave comment as well?(Y/N)"
-
+           rating = Rating.all.find_by(drink_id: @drinkid_input)
+        if rating
+            Rating.all.where(drink_id: @drinkid_input).update(rating: @input2)
         else
-          valid = true
+            Rating.create(user_id: @save_user.id, drink_id: @drinkid_input, rating: @input2.to_f)
+          end
+        puts "Your rating has been saved"
+        prompt = ">>>> Would you like to leave comment as well?(Y/N)"
+        valid_yes_or_no(prompt, ["yes", "no", "y", "n"])
+        if @input == "y" || @input == "yes"
+          leave_comment(@drinkid_input)
+        else
+          menu_over_20
         end
       end
-      if input3 == "y"
-        leave_comment(@drinkid_input)
-      else
-        menu_over_20
+
+
+
+
+      def display_rate(drink_id)
+        arr = Rating.all.where(drink_id: drink_id).map {|d| d.rating}
+        if arr.length == 0
+          puts " AVG RATING: No rating exists"
+        else
+        avr = arr.sum/arr.length
+        puts  " AVG RATING: #{avr.round(2)}"
       end
-    end
-  end
+      end
+
+
+      def leave_comment(drink_id)
+        # puts "Enter your comment. (limit 50 char)"
+        # @comment = user_input.to_s
+     valid = false
+     until valid
+       puts "Enter your comment. (limit 50 char)"
+       comment = user_input
+        if comment.blank?
+           puts "The comment cannot be blank.".bold
+         elsif comment.length > 50
+           puts "The comment should be less than 50 charaters.".bold
+         else
+           valid = true
+           @comment = comment.to_s
+         end
+       end
+     rating = Rating.all.find_by(drink_id: drink_id)
+     if rating
+       rating.update(comment: @comment)
+     else
+         Rating.create(user_id: @save_user.id, drink_id: drink_id, comment: @comment)
+       end
+       puts "Your comment has been saved"
+       menu_over_20
+
+      end
 
 
 
-    def display_rate(drink_id)
-      arr = Rating.all.where(drink_id: drink_id).map {|d| d.rating}
-      if arr.length == 0
-        puts " AVG RATING: No rating exists"
-      else
-      avr = arr.sum/arr.length
-      puts  " AVG RATING: #{avr.round(2)}"
-    end
-    end
-
-
-    def leave_comment(drink_id)
-      puts "Enter your comment. (limit 100 char)"
-      comment = user_input.to_s
-      rating = Rating.all.find_by(drink_id: drink_id)
-      if rating
-        Rating.all.where(user_id: @save_user).where(drink_id: drink_id).update(comment: comment)
-      else
-          Rating.create(user_id: @save_user, drink_id: drink_id, comment: comment)
+      def display_comment(drink_id)
+        arr = Rating.all.where(drink_id: drink_id).map {|d| d.comment}
+        if arr.length == 0
+          puts "*** Be the first one to leave a comment!! ***"
+        else
+          puts " COMMENT FROM LAST DRINKER: \"#{arr.last}\" "
         end
-        puts "Your comment has been saved"
-        menu_over_20
-    end
-
-
-
-    def display_comment(drink_id)
-      arr = Rating.all.where(drink_id: drink_id).map {|d| d.comment}
-      if arr.length == 0
-        puts "*** Be the first one to leave a comment!! ***"
-      else
-        puts " COMMENT FROM LAST DRINKER: \"#{arr.last}\" "
       end
-    end
-
 
 
 
@@ -402,53 +366,6 @@ attr_reader :last_input
       end
 
 
-      # #y/n input
-      # def yes_or_no_input
-      #   if user_input.downcase != "y" || user_input.downcase != "n"
-      #     puts "Please enter \'y\' or \'n\'."
-      #     yes_or_no_input
-      #   end
-      # end
-      #
-      #
-      # def ask_yes_or_no(q = "Please enter \'y\' or \'n\'.", arr = [Y, N])
-      #   valid = false
-      #     until valid
-      #         puts " <<<<     INVALID     >>>>".red
-      #         user_input
-      #         if arr.include?(user_input)
-      #           valid = true
-      #         end
-      #     end
-      #   end
-      #
-      #
-      #
-      # #whole number input
-      # def integer_input
-      #   if user_input.integer?
-      #     user_input
-      #   else
-      #     put "this is not a valid option"
-      #     user_input
-      #   end
-      # end
-
-
-
-#############IAN's Comment!!!! #################
-      # prompt the user for some input
-      # check if the input is validates
-      # if it is, retun the input1
-      # otherwise, keep asking!
-      def ask(prompt, valid_inputs_arr)
-
-        # put the prompt
-        # save gets.chomp
-        # check if valid (valid_inputs_arr.include?(get.chomp))
-        # if yes, return that input1
-        # if no, loop again
-      end
 
 
       def ask_validity(array)
@@ -456,7 +373,7 @@ attr_reader :last_input
             until valid
             input1 = user_input.to_i
             if !array.include?(input1)
-              puts " <<<<     INVALID     >>>>  \n".red
+              puts " <<<<     INVALID     >>>>  \n".red.bold
               selection
             else
               valid = true
@@ -467,12 +384,19 @@ attr_reader :last_input
 
 
 
-      # put the prompt
-      # save gets.chomp
-      # check if valid (valid_inputs_arr.include?(get.chomp))
-      # if yes, return that input1
-      # if no, loop again
-
+      def valid(prompt, array)
+        valid = false
+        until valid
+          puts prompt
+          input = user_input.to_i
+          if !array.include?(input)
+            puts "<<<<   INVALID!!   >>>>".red.bold
+          else
+            valid = true
+            @input = input
+          end
+        end
+      end
 
 
 
